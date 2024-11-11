@@ -1,0 +1,45 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.35013.160
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2022", "2022", "{AFE3C54D-C254-4995-BF53-06FE34BD3B03}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2023", "2023", "{5E246089-A810-4B4A-93A2-81E880A58393}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2024", "2024", "{97826DE4-258E-4A84-A1C4-08D94BB9BDDB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared codebase", "Shared codebase", "{D9A02077-29E0-4E4C-803A-F56382A194C3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AoC.Pathfinding", "AoC.Pathfinding\AoC.Pathfinding.csproj", "{43B12588-1DFC-447C-81FC-913242552322}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{0AEBD51C-0CA8-4681-A29C-6E1EBDD3524D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestDijkstra", "TestDijkstra\TestDijkstra.csproj", "{4437D025-40A9-499B-BCD0-5FC6B41CF09E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{43B12588-1DFC-447C-81FC-913242552322}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{43B12588-1DFC-447C-81FC-913242552322}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{43B12588-1DFC-447C-81FC-913242552322}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{43B12588-1DFC-447C-81FC-913242552322}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4437D025-40A9-499B-BCD0-5FC6B41CF09E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4437D025-40A9-499B-BCD0-5FC6B41CF09E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4437D025-40A9-499B-BCD0-5FC6B41CF09E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4437D025-40A9-499B-BCD0-5FC6B41CF09E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{43B12588-1DFC-447C-81FC-913242552322} = {D9A02077-29E0-4E4C-803A-F56382A194C3}
+		{4437D025-40A9-499B-BCD0-5FC6B41CF09E} = {0AEBD51C-0CA8-4681-A29C-6E1EBDD3524D}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {AA568CBD-928B-4378-93D6-DA80E336108B}
+	EndGlobalSection
+EndGlobal
