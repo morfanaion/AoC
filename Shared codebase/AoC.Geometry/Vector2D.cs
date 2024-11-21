@@ -1,9 +1,9 @@
-﻿using System.Security.AccessControl;
+﻿using AOC.Maths;
 using static System.Math;
 
 namespace AoC.Geometry
 {
-	public struct Vector2D : IVector
+    public struct Vector2D : IVector
 	{
 		public double X { get; set; }
 		public double Y { get; set; }
@@ -12,7 +12,11 @@ namespace AoC.Geometry
 
 		public double LengthSquared => Pow(X, 2) + Pow(Y, 2);
 
-		public double Dot(Vector2D v) => X * v.X + Y * v.Y;
+        public double GreatestAbsoluteDimension => Max(Abs(X), Abs(Y));
+        public double SumOfDimensions => X + Y;
+		public double SumOfAbsoluteDimensions => Abs(X) + Abs(Y);
+
+        public double Dot(Vector2D v) => X * v.X + Y * v.Y;
 		double IVector.Dot(IVector v)
 		{
 			if (v is Vector2D v2d)

@@ -1,4 +1,5 @@
-﻿using static System.Math;
+﻿using AOC.Maths;
+using static System.Math;
 
 namespace AoC.Geometry
 {
@@ -11,7 +12,11 @@ namespace AoC.Geometry
 		public double Length => Sqrt(LengthSquared);
 		public double LengthSquared => Pow(X, 2) + Pow(Y, 2) + Pow(Z, 2);
 
-		public double Dot(Vector3D v) => X * v.X + Y * v.Y + Z * v.Z;
+        public double GreatestAbsoluteDimension => AoCMath.Max(Abs(X), Abs(Y), Abs(Z));
+        public double SumOfDimensions => X + Y + Z;
+        public double SumOfAbsoluteDimensions => Abs(X) + Abs(Y) + Abs(Z);
+
+        public double Dot(Vector3D v) => X * v.X + Y * v.Y + Z * v.Z;
 		public IVector Cross(IVector v)
 		{
 			throw new NotImplementedException();

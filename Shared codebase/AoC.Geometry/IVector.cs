@@ -7,5 +7,8 @@
 
 		double Dot(IVector v);
 		IVector Cross(IVector v);
-	}
+		double GreatestAbsoluteDimension { get; }
+		double SumOfDimensions { get; }
+        double SumOfAbsoluteDimensions { get; }
+    }
 }

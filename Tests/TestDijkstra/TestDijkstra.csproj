@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Shared codebase\AOC.Maths\AOC.Maths.csproj" />
     <ProjectReference Include="..\..\Shared codebase\AoC.Pathfinding\AoC.Pathfinding.csproj" />
   </ItemGroup>
 
