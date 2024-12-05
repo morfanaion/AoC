@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace Day03Puzzle01
+namespace Day03Puzzle02
 {
     internal partial class RegexHelper
     {

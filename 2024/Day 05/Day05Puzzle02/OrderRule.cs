@@ -1,4 +1,4 @@
-﻿namespace Day05Puzzle01
+﻿namespace Day05Puzzle02
 {
     internal class OrderRule
     {

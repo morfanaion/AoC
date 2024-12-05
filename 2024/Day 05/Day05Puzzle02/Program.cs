@@ -1,4 +1,4 @@
-﻿using Day05Puzzle01;
+﻿using Day05Puzzle02;
 
 int sum = 0;
 List<OrderRule> orderRules = new List<OrderRule>();

@@ -1,4 +1,4 @@
-﻿using Day03Puzzle01;
+﻿using Day03Puzzle02;
 using System.Text.RegularExpressions;
 
 long sum = 0;

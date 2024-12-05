@@ -1,4 +1,4 @@
-﻿namespace Day02Puzzle01
+﻿namespace Day02Puzzle02
 {
     internal class Report
     {
