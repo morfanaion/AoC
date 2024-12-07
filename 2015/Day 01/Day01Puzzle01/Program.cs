@@ -1,0 +1,1 @@
+﻿Console.WriteLine(File.ReadAllText("input.txt.").Sum(c => c == '(' ? 1 : c == ')' ? -1 : 0));
