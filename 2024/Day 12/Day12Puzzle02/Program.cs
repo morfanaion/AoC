@@ -1,6 +1,5 @@
 ﻿using Day12Puzzle02;
 
-DateTime now = DateTime.Now;
 Plot[][] _plots = File.ReadAllLines("input.txt").Select(line => line.Select(c => new Plot() { PlotType = c }).ToArray()).ToArray();
 for(int y = 0; y < _plots.Length; y++)
 {
@@ -150,4 +149,3 @@ foreach (var group in groups)
     Console.WriteLine($"Region with {group.First().PlotType} has area {group.Count()} and sides {CalculateSides(group.Key, group)}");
 }
 Console.WriteLine(groups.Sum(g => g.Count() * CalculateSides(g.Key, g)));
-Console.WriteLine((DateTime.Now - now).TotalMilliseconds);

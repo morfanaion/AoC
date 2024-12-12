@@ -9,7 +9,6 @@
         public long RegionId { get; set; } = PlotIdCounter++;
         public char PlotType { get; set; }
         public int Perimeter { get; set; } = 4;
-        public bool Processed { get; set; } = false;
         public bool FenceNorth { get; set; } = true;
         public bool FenceSouth { get; set; } = true;
         public bool FenceEast { get; set; } = true;
