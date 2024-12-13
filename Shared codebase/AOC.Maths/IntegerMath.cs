@@ -42,5 +42,26 @@ namespace AOC.Maths
 				}
 			}
 		}
-	}
+
+        public static T FindGCD(T a, T b)
+        {
+            if (b == T.Zero)
+            {
+                return a;
+            }
+            return FindGCD(b, a % b);
+        }
+
+        public static T FindLCM(IEnumerable<T> numbers)
+        {
+            T result = numbers.First();
+            foreach(T number in numbers.Skip(1))
+            {
+                result = number * result / FindGCD(number, result);
+            }
+            return result;
+        }
+
+		public static T FindLCM(params T[] numbers) => FindLCM((IEnumerable<T>)numbers);
+    }
 }
