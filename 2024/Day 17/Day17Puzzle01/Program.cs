@@ -16,47 +16,37 @@ List<long> output = new List<long>();
 int iteration = 0;
 for(int i = 0; i < program.Length; i+=2)
 {
-    Console.Write(iteration.ToString("00") + " ");
     byte comboOperand = program[i + 1];
     switch (program[i])
     {
         case ADV:
-            Console.Write($"ADV {comboOperand} ");
             registerA /= (long)Math.Pow(2, GetComboOperandValue(comboOperand));
             break;
         case BXL:
-            Console.Write($"BXL {comboOperand} ");
             registerB ^= comboOperand;
             break;
         case BST:
-            Console.Write($"BST {comboOperand} ");
             registerB = GetComboOperandValue(comboOperand) % 8;
             break;
         case JNZ:
-            Console.Write($"JNZ {comboOperand} ");
             if (registerA!= 0)
             {
                 i = ((int)comboOperand) - 2;
             }
             break;
         case BXC:
-            Console.Write($"BXC {comboOperand} ");
             registerB ^= registerC;
             break;
         case OUT:
-            Console.Write($"OUT {comboOperand} ");
             output.Add(GetComboOperandValue(comboOperand) % 8);
             break;
         case BDV:
-            Console.Write($"BDV {comboOperand} ");
             registerB = registerA / (long)Math.Pow(2, GetComboOperandValue(comboOperand));
             break;
         case CDV:
-            Console.Write($"CDV {comboOperand} ");
             registerC = registerA / (long)Math.Pow(2, GetComboOperandValue(comboOperand));
             break;
     }
-    Console.WriteLine($"A: {registerA} B: {registerB} C: {registerC}");
     iteration++;
 }
 
