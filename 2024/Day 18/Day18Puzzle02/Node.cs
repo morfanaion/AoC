@@ -5,7 +5,7 @@ namespace Day18Puzzle01
 {
 	internal class Node : INode<Vector2D>
 	{
-		public const int MemorySize = 7;
+		public const int MemorySize = 71;
 		public bool Visited { get; set; }
 
 		public Node? North { get; set; }

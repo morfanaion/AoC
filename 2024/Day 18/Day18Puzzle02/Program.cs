@@ -1,5 +1,6 @@
 ﻿using AoC.Geometry;
 using AoC.Pathfinding;
+using AOC.Maths;
 using Day18Puzzle01;
 
 Node?[][] _memory = new Node?[Node.MemorySize][];
@@ -46,11 +47,30 @@ void ResetMemoryTo(int numFallenBytes)
 	}
 }
 
-int maxInt = allFallingBytes.Length;
+int noPathIndex = allFallingBytes.Length;
+int pathIndex = 0;
 
-IEnumerable<Node> path = Dijkstra.FindShortestPath<Node, Vector2D>(_memory[0][0], _memory[6][6]);
-PrintMemory(path);
-Console.WriteLine(path.Count() - 1);
+while(true)
+{
+	int attempt = AoCMath.Average(pathIndex, noPathIndex);
+    if (attempt == pathIndex)
+    {
+		break;
+    }
+    ResetMemoryTo(attempt);
+	IEnumerable<Node> path = Dijkstra.FindShortestPath<Node, Vector2D>(_memory[0][0], _memory[Node.MemorySize - 1][Node.MemorySize - 1]);
+	if(path.Any())
+	{
+		pathIndex = attempt;
+	}
+	else
+	{
+		noPathIndex = attempt;
+	}
+}
+
+
+Console.WriteLine($"{allFallingBytes[pathIndex].x},{allFallingBytes[pathIndex].y}");
 
 
 void PrintMemory(IEnumerable<Node> route)
