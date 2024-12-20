@@ -1,4 +1,5 @@
-﻿(char c, int cost)[][] theMaze = File.ReadAllLines("input.txt").Select(line => line.Select(c => (c, int.MaxValue)).ToArray()).ToArray();
+﻿const int cheatSize = 20;
+(char c, int cost)[][] theMaze = File.ReadAllLines("input.txt").Select(line => line.Select(c => (c, int.MaxValue)).ToArray()).ToArray();
 (int x, int y) startPos = (-1, -1);
 for (int y = 0; y < theMaze.Length; y++)
 {
@@ -14,35 +15,28 @@ for (int y = 0; y < theMaze.Length; y++)
 
 int numStepstaken = 0;
 (int x, int y) currentPos = startPos;
-while(theMaze[currentPos.y][currentPos.x].c != 'E')
+List<(int x, int y)> pathPieces = [startPos];
+while (theMaze[currentPos.y][currentPos.x].c != 'E')
 {
     currentPos = NextPosition(currentPos.x, currentPos.y, numStepstaken);
     theMaze[currentPos.y][currentPos.x].cost = ++numStepstaken;
+    pathPieces.Add(currentPos);
 }
 
 Dictionary<int, int> timeSaves = new Dictionary<int, int>();
-
-for (int y = 0; y < theMaze.Length; y++)
+foreach (((int x, int y) start, (int x, int y) end) in GetAllCombinations(pathPieces))
 {
-    for (int x = 0; x < theMaze[y].Length; x++)
+    int absoluteDistance = Math.Abs(start.x - end.x) + Math.Abs(start.y - end.y);
+    if (absoluteDistance <= cheatSize && theMaze[end.y][end.x].cost > theMaze[start.y][start.x].cost + absoluteDistance)
     {
-        if (theMaze[y][x].c == '#' && x > 0 && x + 1 < theMaze[y].Length && y > 0 && y + 1 < theMaze.Length && NeighbourChars(x, y).Count(n => n.c == '#') <= 2)
+        int timeSaved = theMaze[end.y][end.x].cost - (theMaze[start.y][start.x].cost + absoluteDistance);
+        if (timeSaves.ContainsKey(timeSaved))
         {
-            foreach(((char c, int x, int y) start, (char c, int x, int y) end) in GetAllCombinations(NeighbourChars(x,y).Where(n => n.c != '#')))
-            {
-                int timeSaved = theMaze[end.y][end.x].cost - (theMaze[start.y][start.x].cost + 2);
-                if(timeSaved > 0)
-                {
-                    if(timeSaves.ContainsKey(timeSaved))
-                    {
-                        timeSaves[timeSaved]++;
-                    }
-                    else
-                    {
-                        timeSaves.Add(timeSaved, 1);
-                    }
-                }
-            }
+            timeSaves[timeSaved]++;
+        }
+        else
+        {
+            timeSaves.Add(timeSaved, 1);
         }
     }
 }
@@ -51,7 +45,7 @@ Console.WriteLine(timeSaves.Where(kvp => kvp.Key >= 100).Sum(kvp => kvp.Value));
 
 IEnumerable<(T, T)> GetAllCombinations<T>(IEnumerable<T> enumerable)
 {
-    foreach(T t1 in enumerable)
+    foreach (T t1 in enumerable)
     {
         foreach (T t2 in enumerable)
         {
@@ -59,15 +53,6 @@ IEnumerable<(T, T)> GetAllCombinations<T>(IEnumerable<T> enumerable)
         }
     }
 }
-
-IEnumerable<(char c, int x, int y)> NeighbourChars(int x, int y)
-{
-    yield return (theMaze[y][x - 1].c, x - 1, y);
-    yield return (theMaze[y - 1][x].c, x, y - 1);
-    yield return (theMaze[y][x + 1].c, x + 1, y);
-    yield return (theMaze[y + 1][x].c, x, y + 1);
-}
-
 
 (int x, int y) NextPosition(int x, int y, int numStepsTaken)
 {
@@ -93,4 +78,3 @@ IEnumerable<(char c, int x, int y)> NeighbourChars(int x, int y)
     }
     throw new InvalidOperationException("Don't call on a dead end");
 }
-
