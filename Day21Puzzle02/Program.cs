@@ -4,7 +4,7 @@ Dictionary<(string, int), long> keyPressesDictionary = new Dictionary<(string, i
 long result = 0;
 foreach(string code in codesToPress)
 {
-	long minimum = MinNumKeyPresses((2, 3), code.Select(KeyPadKeyToPosition), (0, 3), 2);
+	long minimum = MinNumKeyPresses((2, 3), code.Select(KeyPadKeyToPosition), (0, 3), 25);
 	Console.WriteLine($"{code}: {minimum}");
 	result += minimum * long.Parse(code.Substring(0, 3));
 }
