@@ -8,14 +8,19 @@ foreach (string computer in computers)
 {
 	foreach ((string, string) pair in pairs.Where(p => p.Item1 == computer))
 	{
+		bool addedToNetwork = false;
 		foreach (var network in networks.Where(n => n.Any(c => c == computer)))
 		{
 			if (network.All(n => pairs.Any(p => p.Item1 == n && p.Item2 == pair.Item2 || p.Item1 == pair.Item2 && p.Item2 == n)))
 			{
+				addedToNetwork = true;
 				network.Add(pair.Item2);
 			}
 		}
-		networks.Add(new List<string> { pair.Item1, pair.Item2 });
+		if (!addedToNetwork)
+		{
+			networks.Add(new List<string> { pair.Item1, pair.Item2 });
+		}
 	}
 }
 
