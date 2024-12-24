@@ -76,6 +76,7 @@ foreach (string line in input)
 {
     processLine(line);
 }
+Console.WriteLine(string.Concat(Gate.Gates.Where(g => g.Id.StartsWith("x")).OrderBy(g => g.Id).Select(g => g.Output ? '1' : '0')));
 
 long resultx = 0;
 foreach (Gate gate in Gate.Gates.Where(g => g.Id.StartsWith("x")).OrderByDescending(g => g.Id))
@@ -86,15 +87,17 @@ foreach (Gate gate in Gate.Gates.Where(g => g.Id.StartsWith("x")).OrderByDescend
         resultx++;
     }
 }
-long resulty = 0;
-foreach (Gate gate in Gate.Gates.Where(g => g.Id.StartsWith("x")).OrderByDescending(g => g.Id))
+long resultx2 = GetXResult();
+Console.WriteLine(Convert.ToString(resultx, 2));
+long resulty = GetYResult();
+/*foreach (Gate gate in Gate.Gates.Where(g => g.Id.StartsWith("x")).OrderByDescending(g => g.Id))
 {
     resulty <<= 1;
     if (gate.Output)
     {
         resulty++;
     }
-}
+}*/
 long expectedResult = resultx + resulty;
 foreach(NonStaticGate gate in Gate.Gates.Where(g => g.Id.StartsWith("z")))
 {
@@ -103,8 +106,9 @@ foreach(NonStaticGate gate in Gate.Gates.Where(g => g.Id.StartsWith("z")))
 long result = GetZResult();
 long diff = result ^ (resultx + resulty);
 List<Gate> correctGates = new List<Gate>();
-List<Gate> swappedGates = new List<Gate>();
-foreach (var gate in AllZs().OrderBy(g => g.Id))
+//List<Gate> swappedGates = new List<Gate>();
+List<NonStaticGate> allZs = AllZs().OrderBy(g => g.Id).ToList();
+/*foreach (var gate in AllZs().OrderBy(g => g.Id))
 {
     Console.WriteLine($"{gate.Id}: {string.Join(",", gate.Nodes.Distinct().Select(g => g.Id))}");
     if(!gate.ValueAsExpected)
@@ -112,7 +116,7 @@ foreach (var gate in AllZs().OrderBy(g => g.Id))
         foreach (NonStaticGate gate1 in gate.Nodes.OfType<NonStaticGate>().Where(g => correctGates.All(g2 => g2.Id != g.Id)))
         {
             bool isOk = false;
-            foreach(NonStaticGate gate2 in gate.Nodes.OfType<NonStaticGate>().Where(g => g.Id != gate1.Id && correctGates.All(g2 => g2.Id != g.Id)))
+            foreach(NonStaticGate gate2 in correctGates.OfType<NonStaticGate>().Where(g => g.Id != gate1.Id && correctGates.All(g2 => g2.Id != g.Id)))
             {
                 SwapGates(gate1, gate2);
                 if(gate.ValueAsExpected)
@@ -133,8 +137,8 @@ foreach (var gate in AllZs().OrderBy(g => g.Id))
     correctGates = gate.Nodes.ToList();
 }
 
-
-List<NonStaticGate> swappableGates = Gate.Gates.OfType<NonStaticGate>().ToList();
+*/
+List<NonStaticGate> swappableGates = AllZs().Where(g => !g.ValueAsExpected).SelectMany(g => g.Nodes).OfType<NonStaticGate>().Distinct().ToList();
 
 /*
  * Fail by brute force
@@ -244,7 +248,7 @@ for (int ig1 = 0; ig1 <= swappableGates.Count - 8; ig1++)
         SwapGates(swappableGates[ig1], swappableGates[ig2]);
     }
 }*/
-/*
+
 List<NonStaticGate> wrongZs = AllZs().Where(g => !g.ValueAsExpected).ToList();
 var faultyGates = wrongZs.SelectMany(AllAncestorGates).GroupBy(g => g.Id).OrderByDescending(group => group.Count());
 List<NonStaticGate> rightZs = AllZs().Where(g => g.ValueAsExpected).ToList();
@@ -292,7 +296,7 @@ foreach (string str in Gate.Gates.Select(g => g.GetDefinitionString()).Where(s =
 {
     Console.WriteLine(str);
 }
-*/
+
 bool OneNotAncestorOfOther(NonStaticGate gate1, NonStaticGate gate2)
 {
     return AllAncestorGates(gate2.Input1).All(g2 => g2.Id != gate1.Id) && AllAncestorGates(gate2.Input2).All(g2 => g2.Id != gate1.Id);
@@ -347,5 +351,7 @@ IEnumerable<NonStaticGate> AllAncestorGates(Gate gate)
 }
 
 long GetZResult() => AllZs().Select(g => g.Value).Combine((v1, v2) => v1 | v2, 0);
+long GetXResult() => Gate.Gates.Where(g => g.Id.StartsWith("x")).Select(g => g.Value).Combine((v1, v2) => v1 | v2, 0);
+long GetYResult() => Gate.Gates.Where(g => g.Id.StartsWith("y")).Select(g => g.Value).Combine((v1, v2) => v1 | v2, 0);
 
 IEnumerable<NonStaticGate> AllZs() => Gate.Gates.Where(g => g.Id.StartsWith("z")).Cast<NonStaticGate>();
