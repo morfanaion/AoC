@@ -148,5 +148,15 @@ namespace AOC.Maths
             }
             return queue.Dequeue();
         }
+
+        public static T Combine<T>(this IEnumerable<T> values, Func<T, T, T> combine, T start)
+            where T: INumber<T>
+        {
+            foreach (T value in values)
+            {
+                start = combine(start, value);
+            }
+            return start;
+        }
     }
 }
