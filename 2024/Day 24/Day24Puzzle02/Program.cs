@@ -1,6 +1,7 @@
 ﻿using Day24Puzzle02;
 using AOC.Maths;
 using System.Text.RegularExpressions;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 Stack<Gate> _stackOfGates = new Stack<Gate>();
 
@@ -76,35 +77,18 @@ foreach (string line in input)
 {
     processLine(line);
 }
-Console.WriteLine(string.Concat(Gate.Gates.Where(g => g.Id.StartsWith("x")).OrderBy(g => g.Id).Select(g => g.Output ? '1' : '0')));
+Console.WriteLine(string.Concat(Gate.Gates.Where(g => g.Id.StartsWith("x")).OrderByDescending(g => g.Id).Select(g => g.Output ? '1' : '0')));
 
-long resultx = 0;
-foreach (Gate gate in Gate.Gates.Where(g => g.Id.StartsWith("x")).OrderByDescending(g => g.Id))
-{
-    resultx <<= 1;
-    if (gate.Output)
-    {
-        resultx++;
-    }
-}
-long resultx2 = GetXResult();
-Console.WriteLine(Convert.ToString(resultx, 2));
+long resultx = GetXResult();
 long resulty = GetYResult();
-/*foreach (Gate gate in Gate.Gates.Where(g => g.Id.StartsWith("x")).OrderByDescending(g => g.Id))
-{
-    resulty <<= 1;
-    if (gate.Output)
-    {
-        resulty++;
-    }
-}*/
 long expectedResult = resultx + resulty;
+Console.WriteLine(Convert.ToString(expectedResult, 2));
 foreach(NonStaticGate gate in Gate.Gates.Where(g => g.Id.StartsWith("z")))
 {
     gate.SetExpectedValue(expectedResult);
 }
 long result = GetZResult();
-long diff = result ^ (resultx + resulty);
+Console.WriteLine(Convert.ToString(result, 2));
 List<Gate> correctGates = new List<Gate>();
 //List<Gate> swappedGates = new List<Gate>();
 List<NonStaticGate> allZs = AllZs().OrderBy(g => g.Id).ToList();
@@ -138,7 +122,7 @@ List<NonStaticGate> allZs = AllZs().OrderBy(g => g.Id).ToList();
 }
 
 */
-List<NonStaticGate> swappableGates = AllZs().Where(g => !g.ValueAsExpected).SelectMany(g => g.Nodes).OfType<NonStaticGate>().Distinct().ToList();
+List<NonStaticGate> swappableGates = AllZs().Where(g => !g.ValueAsExpected).SelectMany(g => g.Nodes).Concat(AllZs()).OfType<NonStaticGate>().Distinct().ToList();
 
 /*
  * Fail by brute force
@@ -253,44 +237,52 @@ List<NonStaticGate> wrongZs = AllZs().Where(g => !g.ValueAsExpected).ToList();
 var faultyGates = wrongZs.SelectMany(AllAncestorGates).GroupBy(g => g.Id).OrderByDescending(group => group.Count());
 List<NonStaticGate> rightZs = AllZs().Where(g => g.ValueAsExpected).ToList();
 List<NonStaticGate> excludedGatesForSwapping = new List<NonStaticGate>();
-List<NonStaticGate> swappedGates = new List<NonStaticGate>();
-foreach(Gate gate in rightZs)
+List<(NonStaticGate, NonStaticGate)> swappedGates = new List<(NonStaticGate, NonStaticGate)>();
+int attempt = 0;
+List<PriorityQueue<(NonStaticGate gate1, NonStaticGate gate2), int>> queues = new List<PriorityQueue<(NonStaticGate gate1, NonStaticGate gate2), int>>()
 {
-    //excludedGatesForSwapping.AddRange(AllAncestorGates(gate));
-}
-while(wrongZs.Any())
+  new PriorityQueue<(NonStaticGate gate1, NonStaticGate gate2), int>(),
+	new PriorityQueue<(NonStaticGate gate1, NonStaticGate gate2), int>(),
+	new PriorityQueue<(NonStaticGate gate1, NonStaticGate gate2), int>(),
+	new PriorityQueue<(NonStaticGate gate1, NonStaticGate gate2), int>()
+};
+while (wrongZs.Any())
 {
-    NonStaticGate? gate1toSwap = null;
-    NonStaticGate? gate2toSwap = null;
-    int difference = 0;
-    foreach (NonStaticGate gate1 in swappableGates)
+  foreach (NonStaticGate gate1 in swappableGates)
+  {
+    foreach (NonStaticGate gate2 in swappableGates.Where(g => g.Id != gate1.Id))
     {
-        foreach (NonStaticGate gate2 in swappableGates.Where(g => g.Id != gate1.Id))
-        {
-            SwapGates(gate1, gate2);
-            Gate.ValidResult = true;
-            int newDifference = AllZs().Count(g => g.ValueAsExpected) - rightZs.Count;
-            if (newDifference > difference && Gate.ValidResult)
-            {
-                gate1toSwap = gate1;
-                gate2toSwap = gate2;
-                difference = newDifference;
-            }
-            SwapGates(gate1, gate2);
-        }
+      SwapGates(gate1, gate2);
+      Gate.ValidResult = true;
+      int newDifference = AllZs().Count(g => g.ValueAsExpected) - rightZs.Count;
+      if (newDifference > 0)
+      {
+        queues[attempt].Enqueue((gate1, gate2), 100 - newDifference);
+      }
+      SwapGates(gate1, gate2);
     }
-    if(difference != 0)
-    {
-        SwapGates(gate1toSwap ?? throw new InvalidOperationException("Cannot be null here"), gate2toSwap ?? throw new InvalidOperationException("Cannot be null here"));
-        swappedGates.Add(gate1toSwap);
-        swappedGates.Add(gate2toSwap);
-        rightZs = AllZs().Where(g => g.ValueAsExpected).ToList();
-        wrongZs = AllZs().Where(g => !g.ValueAsExpected).ToList();
-        swappableGates = AllZs().Where(g => !g.ValueAsExpected && swappedGates.All(g2 => g2 != g)).SelectMany(AllAncestorGates).Distinct().OrderBy(g => g.Id).ToList();
-    }
+  }
+  if (queues[attempt].Count > 0)
+  {
+		(NonStaticGate gate1, NonStaticGate gate2) = queues[attempt].Dequeue();
+    SwapGates(gate1, gate2);
+    swappedGates.Add((gate1, gate2));
+    rightZs = AllZs().Where(g => g.ValueAsExpected).ToList();
+    wrongZs = AllZs().Where(g => !g.ValueAsExpected).ToList();
+    swappableGates = AllZs().Where(g => !g.ValueAsExpected).SelectMany(g => g.Nodes).Concat(AllZs()).OfType<NonStaticGate>().Distinct().ToList();
+    attempt++;
+  }
+  else
+  {
+    (NonStaticGate gate1, NonStaticGate gate2) = swappedGates[attempt];
+		SwapGates(gate1, gate2);
+    swappedGates.RemoveAt(attempt);
+	}
 }
+long zresult = GetZResult();
+Console.WriteLine(string.Join(',', swappedGates.Select(g => g.Id).Order()));
 
-long actualResult = AllZs().Select(g => g.Value).Combine((v1, v2) => v1 | v2, 0);
+//long actualResult = AllZs().Select(g => g.Value).Combine((v1, v2) => v1 | v2, 0);
 
 foreach (string str in Gate.Gates.Select(g => g.GetDefinitionString()).Where(s => input.All(i => i != s)))
 {
@@ -304,15 +296,18 @@ bool OneNotAncestorOfOther(NonStaticGate gate1, NonStaticGate gate2)
 
 void SwapGates(NonStaticGate gate1, NonStaticGate gate2)
 {
-    Func<Gate, Gate, bool> comparerHolder = gate1.CompareFunction;
-    Gate input1Holder = gate1.Input1;
-    Gate input2Holder = gate1.Input2;
-    gate1.CompareFunction = gate2.CompareFunction;
-    gate1.Input1 = gate2.Input1;
-    gate1.Input2 = gate2.Input2;
-    gate2.CompareFunction = comparerHolder;
-    gate2.Input1 = input1Holder;
-    gate2.Input2 = input2Holder;
+  Func<Gate, Gate, bool> comparerHolder = gate1.CompareFunction;
+  Gate input1Holder = gate1.Input1;
+  Gate input2Holder = gate1.Input2;
+  string op = gate1.Operator;
+  gate1.CompareFunction = gate2.CompareFunction;
+  gate1.Input1 = gate2.Input1;
+  gate1.Input2 = gate2.Input2;
+  gate1.Operator = gate2.Operator;
+  gate2.CompareFunction = comparerHolder;
+  gate2.Input1 = input1Holder;
+  gate2.Input2 = input2Holder;
+  gate2.Operator = gate1.Operator;
 }
 
 IEnumerable<(T, T)> AllCombinations<T>(IEnumerable<T> enumerable)
