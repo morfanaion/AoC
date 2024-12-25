@@ -75,90 +75,39 @@ foreach (string line in input)
     processLine(line);
 }
 
-// first get the numbers that represent x and y
-long resultx = GetXResult();
-long resulty = GetYResult();
-// add them together to get the result we want
-long expectedResult = resultx + resulty;
-// tell all Zs what the expected result should be and let them determine what output they need to create to get that result
-foreach(NonStaticGate gate in Gate.Gates.Where(g => g.Id.StartsWith("z")))
-{
-    gate.SetExpectedValue(expectedResult);
-}
-long result = GetZResult();
-// determine, given the Zs that are incorrect, which gates are their ancestors and include the Zs themselves
-List<NonStaticGate> swappableGates = AllZs().Where(g => !g.ValueAsExpected).SelectMany(g => g.Nodes).Concat(AllZs()).OfType<NonStaticGate>().Distinct().ToList();
-// create lists of Zs that were wrong and Zs that were right for checking purposes
-List<NonStaticGate> wrongZs = AllZs().Where(g => !g.ValueAsExpected).ToList();
-List<NonStaticGate> rightZs = AllZs().Where(g => g.ValueAsExpected).ToList();
-// create a list to hold our swaps
+List<StaticGate> AllXs = Gate.Gates.OfType<StaticGate>().Where(g => g.IsX).OrderBy(g => g.Index).ToList();
+List<StaticGate> AllYs = Gate.Gates.OfType<StaticGate>().Where(g => g.IsY).OrderBy(g => g.Index).ToList();
+List<NonStaticGate> AllZs = Gate.Gates.OfType<NonStaticGate>().Where(g => g.IsZ).OrderBy(g => g.Index).ToList();
+IEnumerable<NonStaticGate> allFaultedZs = GetAllFaultedZs();
 List<(NonStaticGate, NonStaticGate)> swappedGates = new List<(NonStaticGate, NonStaticGate)>();
-int attempt = 0;
-// put a system in place to try different swaps if 1 swap does not least to an answer
-List<PriorityQueue<(NonStaticGate gate1, NonStaticGate gate2), int>> queues = new List<PriorityQueue<(NonStaticGate gate1, NonStaticGate gate2), int>>()
+
+while (allFaultedZs.Any())
 {
-    new PriorityQueue<(NonStaticGate gate1, NonStaticGate gate2), int>(),
-    new PriorityQueue<(NonStaticGate gate1, NonStaticGate gate2), int>(),
-    new PriorityQueue<(NonStaticGate gate1, NonStaticGate gate2), int>(),
-    new PriorityQueue<(NonStaticGate gate1, NonStaticGate gate2), int>()
-};
-while (wrongZs.Any())
-{
-    if (attempt < 4)
+    NonStaticGate faultedGate = allFaultedZs.OrderBy(g => g.Index).First();
+    bool swapDone = false;
+    foreach (NonStaticGate swapGate1 in faultedGate.Nodes.Append(faultedGate).OfType<NonStaticGate>().Distinct())
     {
-        foreach (NonStaticGate gate1 in swappableGates)
+        foreach (NonStaticGate swapGate2 in Gate.Gates.OfType<NonStaticGate>().Where(g => g.Nodes.OfType<StaticGate>().All(g => g.Index <= faultedGate.Index)))
         {
-            foreach (NonStaticGate gate2 in swappableGates.Where(g => g.Id != gate1.Id))
+            Gate.ValidResult = true;
+            SwapGates(swapGate1, swapGate2);
+            if (!GetAllFaultedZs().Any(g => g.Index <= faultedGate.Index) && Gate.ValidResult)
             {
-                SwapGates(gate1, gate2);
-                Gate.ValidResult = true;
-                int newDifference = AllZs().Count(g => g.ValueAsExpected) - rightZs.Count;
-                // if we are getting more correct Zs, add them to the queue for this iteration
-                if (newDifference > 0)
-                {
-                    queues[attempt].Enqueue((gate1, gate2), 100 - newDifference);
-                }
-                SwapGates(gate1, gate2);
+                // this swap causes all zs till now to correct themselves, maintain the swap, store it, move on to the next gate
+                swappedGates.Add((swapGate1, swapGate2));
+                allFaultedZs = GetAllFaultedZs();
+                swapDone = true;
+                break;
             }
+            SwapGates(swapGate1, swapGate2);
         }
-    }
-    if (queues[attempt].Count > 0 || attempt >= 4)
-    {
-        (NonStaticGate gate1, NonStaticGate gate2) = queues[attempt].Dequeue();
-        SwapGates(gate1, gate2);
-        swappedGates.Add((gate1, gate2));
-        rightZs = AllZs().Where(g => g.ValueAsExpected).ToList();
-        wrongZs = AllZs().Where(g => !g.ValueAsExpected).ToList();
-        swappableGates = AllZs().Where(g => !g.ValueAsExpected).SelectMany(g => g.Nodes).Concat(AllZs()).OfType<NonStaticGate>().Where(g => swappedGates.All(s => s.Item1.Id != g.Id && s.Item2.Id != g.Id)).Distinct().ToList();
-        attempt++;
-    }
-    else
-    {
-        // our current attempt has no more items in the queue, we need to revert the last swap and try again.
-        bool stillHaveAChance = false;
-        while (attempt > 0 && !stillHaveAChance)
+        if(swapDone)
         {
-            attempt--;
-            (NonStaticGate gate1, NonStaticGate gate2) = swappedGates[attempt];
-            SwapGates(gate1, gate2);
-            swappedGates.RemoveAt(attempt);
-            if (queues[attempt].TryDequeue(out (NonStaticGate gate1, NonStaticGate gate2) dequeued, out int priority))
-            {
-                stillHaveAChance = true;
-                SwapGates(dequeued.gate1, dequeued.gate2);
-                swappedGates.Add((dequeued.gate1, dequeued.gate2));
-                rightZs = AllZs().Where(g => g.ValueAsExpected).ToList();
-                wrongZs = AllZs().Where(g => !g.ValueAsExpected).ToList();
-                swappableGates = AllZs().Where(g => !g.ValueAsExpected).SelectMany(g => g.Nodes).Concat(AllZs()).OfType<NonStaticGate>().Where(g => swappedGates.All(s => s.Item1.Id != g.Id && s.Item2.Id != g.Id)).Distinct().ToList();
-                attempt++;
-            }
+            break;
         }
     }
 }
-Console.WriteLine(string.Join(',', swappedGates.SelectMany(g => new string[] { g.Item1.Id, g.Item2.Id }).Order()));
-Console.WriteLine($"Expected output: {expectedResult}");
-Console.WriteLine($"Actual output: {GetZResult()}");
-
+Console.WriteLine(string.Join(",", swappedGates.SelectMany(p => new string[] { p.Item1.Id, p.Item2.Id }).Order()));
 void SwapGates(NonStaticGate gate1, NonStaticGate gate2)
 {
   Func<Gate, Gate, bool> comparerHolder = gate1.CompareFunction;
@@ -175,8 +124,66 @@ void SwapGates(NonStaticGate gate1, NonStaticGate gate2)
   gate2.Operator = gate1.Operator;
 }
 
-long GetZResult() => AllZs().Select(g => g.Value).Combine((v1, v2) => v1 | v2, 0);
-long GetXResult() => Gate.Gates.Where(g => g.Id.StartsWith("x")).Select(g => g.Value).Combine((v1, v2) => v1 | v2, 0);
-long GetYResult() => Gate.Gates.Where(g => g.Id.StartsWith("y")).Select(g => g.Value).Combine((v1, v2) => v1 | v2, 0);
+long GetXResult() => AllXs.Select(g => g.Value).Combine((v1, v2) => v1 | v2, 0);
+long GetYResult() => AllYs.Select(g => g.Value).Combine((v1, v2) => v1 | v2, 0);
 
-IEnumerable<NonStaticGate> AllZs() => Gate.Gates.Where(g => g.Id.StartsWith("z")).Cast<NonStaticGate>();
+IEnumerable<NonStaticGate> GetAllFaultedZs()
+{
+    long startResultX = GetXResult();
+    long startResultY = GetYResult();
+    SetInputValuesAndExpectedValue(0b000000000000000000000000000000000000000000000, 0b111111111111111111111111111111111111111111111);
+    IEnumerable<NonStaticGate> gatesToBeTrue = AllZs.Where(g => g.ExpectedOutput);
+    List<NonStaticGate> result = AllZs.Where(g => !g.ValueAsExpected).ToList();
+    SetInputValuesAndExpectedValue(0b111111111111111111111111111111111111111111111, 0b000000000000000000000000000000000000000000000);
+    gatesToBeTrue = AllZs.Where(g => g.ExpectedOutput);
+    result.AddRange(AllZs.Where(g => !g.ValueAsExpected));
+    SetInputValuesAndExpectedValue(0b101010101010101010101010101010101010101010101, 0b010101010101010101010101010101010101010101010);
+    gatesToBeTrue = AllZs.Where(g => g.ExpectedOutput);
+    result.AddRange(AllZs.Where(g => !g.ValueAsExpected));
+    SetInputValuesAndExpectedValue(0b010101010101010101010101010101010101010101010, 0b010101010101010101010101010101010101010101010);
+    gatesToBeTrue = AllZs.Where(g => g.ExpectedOutput);
+    result.AddRange(AllZs.Where(g => !g.ValueAsExpected));
+    SetInputValuesAndExpectedValue(0b101010101010101010101010101010101010101010101, 0b101010101010101010101010101010101010101010101);
+    gatesToBeTrue = AllZs.Where(g => g.ExpectedOutput);
+    result.AddRange(AllZs.Where(g => !g.ValueAsExpected));
+    SetInputValuesAndExpectedValue(0b010101010101010101010101010101010101010101010, 0b101010101010101010101010101010101010101010101);
+    gatesToBeTrue = AllZs.Where(g => g.ExpectedOutput);
+    result.AddRange(AllZs.Where(g => !g.ValueAsExpected));
+    SetInputValuesAndExpectedValue(0b000111000111000111000111000111000111000111000, 0b001110001110001110001110001110001110001110001);
+    gatesToBeTrue = AllZs.Where(g => g.ExpectedOutput);
+    result.AddRange(AllZs.Where(g => !g.ValueAsExpected));
+    SetInputValuesAndExpectedValue(0b001110001110001110001110001110001110001110001, 0b011100011100011100011100011100011100011100011);
+    gatesToBeTrue = AllZs.Where(g => g.ExpectedOutput);
+    result.AddRange(AllZs.Where(g => !g.ValueAsExpected));
+    SetInputValuesAndExpectedValue(0b011100011100011100011100011100011100011100010, 0b111000111000111000111000111000111000111000111);
+    gatesToBeTrue = AllZs.Where(g => g.ExpectedOutput);
+    result.AddRange(AllZs.Where(g => !g.ValueAsExpected));
+    SetInputValuesAndExpectedValue(0b111111111111111111111111111111111111111111111, 0b111111111111111111111111111111111111111111111);
+    gatesToBeTrue = AllZs.Where(g => g.ExpectedOutput);
+    result.AddRange(AllZs.Where(g => !g.ValueAsExpected));
+    SetInputValuesAndExpectedValue(startResultX, startResultY);
+    gatesToBeTrue = AllZs.Where(g => g.ExpectedOutput);
+    result.AddRange(AllZs.Where(g => !g.ValueAsExpected));
+    result = result.Distinct().ToList();
+    return result.Distinct();
+}
+
+void SetInputValuesAndExpectedValue(long x, long y)
+{
+    foreach (var gate in AllXs)
+    {
+        gate.SetInput(x);
+    }
+    foreach (var gate in AllYs)
+    {
+        gate.SetInput(y);
+    }
+    long newX = GetXResult();
+    long newY = GetYResult();
+    long expectedResult = GetXResult() + GetYResult();
+    foreach(var gate in AllZs)
+    {
+        gate.SetExpectedValue(expectedResult);
+    }
+}
+

@@ -6,5 +6,10 @@
 		public override bool Output => Input;
 
         public override string GetDefinitionString() => $"{Id}: {(Input ? 1 : 0)}";
+
+		public void SetInput(long input)
+		{
+			Input = (input & ValueIfSet) == ValueIfSet;
+		}
     }
 }
