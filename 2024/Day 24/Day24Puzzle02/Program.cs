@@ -80,13 +80,13 @@ List<StaticGate> AllYs = Gate.Gates.OfType<StaticGate>().Where(g => g.IsY).Order
 List<NonStaticGate> AllZs = Gate.Gates.OfType<NonStaticGate>().Where(g => g.IsZ).OrderBy(g => g.Index).ToList();
 IEnumerable<NonStaticGate> allFaultedZs = GetAllFaultedZs();
 List<(NonStaticGate, NonStaticGate)> swappedGates = new List<(NonStaticGate, NonStaticGate)>();
-
+DateTime start = DateTime.Now;
 while (allFaultedZs.Any())
 {
     NonStaticGate faultedGate = allFaultedZs.OrderBy(g => g.Index).First();
     List<Gate> fixedGates = AllZs.Where(g => g.Index < faultedGate.Index).SelectMany(g => g.Nodes).Distinct().ToList();
     bool swapDone = false;
-    foreach (NonStaticGate swapGate1 in faultedGate.Nodes.Append(faultedGate).OfType<NonStaticGate>().Distinct())
+    foreach (NonStaticGate swapGate1 in faultedGate.Nodes.Append(faultedGate).Where(g => fixedGates.All(g2 => g2.Id != g.Id)).OfType<NonStaticGate>().Distinct())
     {
         foreach (NonStaticGate swapGate2 in Gate.Gates.OfType<NonStaticGate>().Where(g => fixedGates.All(g2 => g2.Id != g.Id) && g.Nodes.OfType<StaticGate>().All(g => g.Index <= faultedGate.Index)))
         {
