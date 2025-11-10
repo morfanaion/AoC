@@ -1,6 +1,4 @@
-﻿using static System.Runtime.InteropServices.JavaScript.JSType;
-
-long sum = 0;
+﻿long sum = 0;
 Dictionary<(long, long, long, long), long> bananasDictionary = new Dictionary<(long, long, long, long), long>();
 foreach(long number in File.ReadAllLines("input.txt").Select(long.Parse))
 {

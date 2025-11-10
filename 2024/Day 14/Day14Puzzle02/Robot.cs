@@ -1,7 +1,4 @@
-﻿
-using System.Text.RegularExpressions;
-
-namespace Day14Puzzle02
+﻿namespace Day14Puzzle02
 {
 	internal class Robot
 	{

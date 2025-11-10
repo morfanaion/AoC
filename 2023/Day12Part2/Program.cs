@@ -7,8 +7,6 @@ Task[] tasks = groups.Select(g => Task.Run(() => g.FindSolves())).ToArray();
 Task.WaitAll(tasks);
 Console.WriteLine(groups.Sum(g => g.NumSolves));
 */
-using System;
-
 internal class Program
 {
     public static readonly char[] nonPeriod = { '?', '#' };

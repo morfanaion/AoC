@@ -1,5 +1,4 @@
-﻿using AOC.Maths;
-using static System.Math;
+﻿using static System.Math;
 
 namespace AoC.Geometry
 {

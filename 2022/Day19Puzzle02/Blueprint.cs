@@ -1,6 +1,4 @@
-﻿using System.Text.RegularExpressions;
-
-namespace Day19Puzzle02
+﻿namespace Day19Puzzle02
 {
     internal class Blueprint
     {

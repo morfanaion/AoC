@@ -1,6 +1,5 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using Day11Puzzle02;
-using System.Text.RegularExpressions;
 
 Monkey? currentMonkey = null;
 foreach (string line in File.ReadAllLines("Input.txt"))

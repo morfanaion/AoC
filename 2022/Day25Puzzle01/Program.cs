@@ -1,6 +1,4 @@
 ﻿// See https://aka.ms/new-console-template for more information
-using System.Numerics;
-
 Console.WriteLine(DecimalToSnafu(File.ReadAllLines("Input.txt").Select(line => SnafuToDecimal(line)).Sum()));
 
 long SnafuToDecimal(string line)

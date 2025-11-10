@@ -1,5 +1,4 @@
 ﻿using Day21Puzzle02;
-using System.Text.RegularExpressions;
 
 Regex lineRegex = new Regex(@"(?<id>[a-z]{4}): (?<definition>(([a-z]{4} . [a-z]{4})|(\d*)))");
 Regex definitionRegex = new Regex(@"(?<othermonkey1id>[a-z]{4}) (?<operator>.) (?<othermonkey2id>[a-z]{4})");

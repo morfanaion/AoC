@@ -1,6 +1,4 @@
-﻿using System.Text.RegularExpressions;
-
-namespace Day18Part1
+﻿namespace Day18Part1
 {
     internal partial class RegexHelper
     {

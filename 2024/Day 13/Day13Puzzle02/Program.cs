@@ -1,6 +1,5 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using Day13Puzzle02;
-using System.Text.RegularExpressions;
 
 Regex buttonRegex = RegexHelper.GetButtonRegex();
 Regex prizeRegex = RegexHelper.GetPrizeRegex();

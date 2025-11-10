@@ -1,5 +1,4 @@
 ﻿using Day24Puzzle01;
-using System.Text.RegularExpressions;
 
 Dictionary<string, List<Action<Gate>>> queuedGateActions = new Dictionary<string, List<Action<Gate>>>();
 Action<string> processLine = line =>

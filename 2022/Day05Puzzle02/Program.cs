@@ -1,7 +1,6 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
 using Day05Puzzle02;
-using System.Text.RegularExpressions;
 
 List<string> lines = File.ReadAllLines("Input.txt").ToList();
 int numLinesForStacks = lines.IndexOf(string.Empty);

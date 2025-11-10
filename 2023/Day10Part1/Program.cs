@@ -1,6 +1,5 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using Day10Part1;
-using System.Net.Http.Headers;
 
 Pipe.ThePipeGrid = File.ReadAllLines("input.txt").Select(line => line.Select(c => new Pipe() { Type = c }).ToArray()).ToArray();
 Pipe startPipe = GetStartPipe(out int x, out int y);

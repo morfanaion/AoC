@@ -1,6 +1,5 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using Day24Part2;
-using static System.Net.Mime.MediaTypeNames;
 
 List<Line> hailstones = File.ReadAllLines("input.txt").Select(Line.FromDefinition).ToList();
 IEnumerable<VectorOption> options = GenerateOptions(hailstones[0], hailstones[1]);

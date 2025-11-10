@@ -1,6 +1,4 @@
-﻿using System.Text;
-
-namespace Day12Part1
+﻿namespace Day12Part1
 {
     internal class SpringCollection
     {

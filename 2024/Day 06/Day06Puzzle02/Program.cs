@@ -1,6 +1,4 @@
-﻿using System.Collections;
-
-char[][] theGrid = File.ReadAllLines("input.txt").Select(line => line.ToArray()).ToArray();
+﻿char[][] theGrid = File.ReadAllLines("input.txt").Select(line => line.ToArray()).ToArray();
 char[][] originalGrid = theGrid.Select(line => line.ToArray()).ToArray();
 int startX = 0;
 int startY = 0;

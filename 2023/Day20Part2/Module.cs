@@ -1,6 +1,4 @@
-﻿using System.Text.RegularExpressions;
-
-namespace Day20Part2
+﻿namespace Day20Part2
 {
     internal abstract class Module(string id, string[] outputModules)
     {

@@ -1,6 +1,5 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using Day16Puzzle01;
-using System.Text.RegularExpressions;
 
 Valve ValveFromMatch(Match match) => new Valve()
 {

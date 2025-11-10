@@ -1,6 +1,4 @@
-﻿using System.Collections;
-
-Dictionary<char, List<(int, int)>> antennas = new Dictionary<char, List<(int, int)>>();
+﻿Dictionary<char, List<(int, int)>> antennas = new Dictionary<char, List<(int, int)>>();
 int maxX = -1;
 int maxY = -1;
 foreach(string line in File.ReadAllLines("input.txt"))

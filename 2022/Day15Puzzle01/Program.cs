@@ -1,6 +1,5 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using Day15Puzzle01;
-using System.Text.RegularExpressions;
 
 Regex regex = new Regex(@"Sensor at x=(?<SX>-?\d*), y=(?<SY>-?\d*): closest beacon is at x=(?<BX>-?\d*), y=(?<BY>-?\d*)");
 List<SensorReport> reports = new List<SensorReport>();

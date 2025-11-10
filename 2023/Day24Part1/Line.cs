@@ -1,6 +1,4 @@
-﻿using System.Numerics;
-
-namespace Day24Part1
+﻿namespace Day24Part1
 {
     internal class Line(Point startPoint, Point direction)
     {
