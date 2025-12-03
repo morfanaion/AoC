@@ -1,28 +1,43 @@
 ﻿(string lowBound, string highBound)[] inputs = File.ReadAllText("input.txt").Split(',').Select(s => s.Split('-')).Select<string[], (string lowBound, string highBound)>(p => new(p[0], p[1])).ToArray();
-foreach((string lowBound, string highBound) input in inputs)
+List<ulong> invalidIds = new List<ulong>();
+foreach ((string lowBound, string highBound) input in inputs)
 {
-    if(input.lowBound.Length == input.highBound.Length)
+    List<ulong> InvalidIdsForRange = new List<ulong>();
+    for (int stringSize = input.lowBound.Length; stringSize <= input.highBound.Length; stringSize++)
     {
-        // same length
-        for (int groupSize = 1; groupSize < input.lowBound.Length - 1; groupSize++)
+        for (int groupSize = 1; groupSize < stringSize; groupSize++)
         {
-            if (input.lowBound.Length % groupSize != 0)
+            if (stringSize % groupSize != 0)
             {
                 continue;
             }
-            ulong lowerBoundStartNum = ulong.Parse(input.lowBound.Substring(0, groupSize));
-            ulong higherBoundStartNum = ulong.Parse(input.highBound.Substring(0, groupSize));
-            ulong lowerBoundRemainder = ulong.Parse(input.lowBound.Substring(groupSize));
-            ulong higherBoundRemainder = ulong.Parse(input.highBound.Substring(groupSize));
-            if (lowerBoundStartNum == higherBoundStartNum)
+            ulong lowerBoundStartNum = (ulong)Math.Pow(10, groupSize - 1);
+            ulong lowerBoundRemainder = 0;
+            if (stringSize == input.lowBound.Length)
             {
-                // check for numbers within range
-                continue;
+                string[] lowBoundGroups = SplitStringBySize(input.lowBound, groupSize).ToArray();
+                lowerBoundStartNum = ulong.Parse(lowBoundGroups[0]);
+                lowerBoundRemainder = lowBoundGroups.Skip(1).Select(ulong.Parse).Max();
             }
-            // check for numbers from 
+            ulong higherBoundStartNum = (ulong)Math.Pow(10, groupSize) - 1;
+            ulong higherBoundRemainder = higherBoundStartNum;
+            if (stringSize == input.highBound.Length)
+            {
+                string[] highBoundGroups = SplitStringBySize(input.highBound, groupSize).ToArray();
+                higherBoundStartNum = ulong.Parse(highBoundGroups[0]);
+                higherBoundRemainder = highBoundGroups.Skip(1).Select(ulong.Parse).Min();
+            }
+            InvalidIdsForRange.AddRange(Process(lowerBoundStartNum, lowerBoundRemainder, higherBoundStartNum, higherBoundRemainder, stringSize / groupSize));
         }
     }
+    invalidIds.AddRange(InvalidIdsForRange.Distinct());
 }
+ulong result = 0;
+foreach(ulong invalidId in invalidIds)
+{
+       result += invalidId;
+}
+Console.WriteLine(result);
 
 IEnumerable<string> SplitStringBySize(string input, int size)
 {
@@ -36,3 +51,30 @@ IEnumerable<string> SplitStringBySize(string input, int size)
     }
 }
 
+IEnumerable<ulong> Process(ulong startNumberLowBound, ulong valueForStartLowBound, ulong startNumberHighBound, ulong valueForEndHighBound, int numGroups)
+{
+    if (startNumberLowBound > startNumberHighBound)
+    {
+        yield break;
+    }
+    if (startNumberLowBound == startNumberHighBound)
+    {
+        if (valueForStartLowBound <= startNumberHighBound && valueForEndHighBound >= startNumberHighBound)
+        {
+            yield return ulong.Parse(string.Concat(Enumerable.Repeat(startNumberHighBound.ToString(), numGroups)));
+        }
+        yield break;
+    }
+    if (valueForStartLowBound <= startNumberLowBound)
+    {
+        yield return ulong.Parse(string.Concat(Enumerable.Repeat(startNumberLowBound.ToString(), numGroups)));
+    }
+    if (valueForEndHighBound >= startNumberHighBound)
+    {
+        yield return ulong.Parse(string.Concat(Enumerable.Repeat(startNumberHighBound.ToString(), numGroups)));
+    }
+    for (ulong i = startNumberLowBound + 1; i < startNumberHighBound; i++)
+    {
+        yield return ulong.Parse(string.Concat(Enumerable.Repeat(i.ToString(), numGroups)));
+    }
+}
